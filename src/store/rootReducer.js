@@ -1,16 +1,16 @@
 import { combineReducers } from "@reduxjs/toolkit";
-
+import user from "./userSlice";
 const createReducer = (asyncReducers) => (state, action) => {
-  console.log({asyncReducers})
   const combinedReducer = combineReducers({
-    ...asyncReducers
-  })
+    user,
+    ...asyncReducers,
+  });
 
-  if (action.type === 'user/userLoggedOut') {
+  if (action.type === "user/userLoggedOut") {
     state = undefined;
   }
 
   return combinedReducer(state, action);
-} 
+}; 
 
 export default createReducer

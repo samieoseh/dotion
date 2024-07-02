@@ -1,7 +1,8 @@
 const jwtServiceConfig = {
-  signIn: "auth/login",
-  signUp: "auth/signup",
-  signUpWithToken: "auth/signup-with-token",
-}
+  login: "auth/login",
+  loginpWithToken: "auth/login-with-token",
+  sendToken: "auth/send-token",
+  refresh: "auth/refresh",
+};
 
 export default jwtServiceConfig;

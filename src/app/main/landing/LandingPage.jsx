@@ -43,10 +43,16 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="mx-auto w-full flex items-center justify-between py-8 flex-col space-y-4">
-          <Link className="rounded-md bg-primary  text-white text-lg px-5 py-2 font-semibold" to="/signup">
+          <Link
+            className="rounded-md bg-primary  text-white text-lg px-5 py-2 font-semibold"
+            to="/login"
+          >
             Get Notion free
           </Link>
-          <Link to="/" className="text-lg text-primary flex items-center justify-center gap-2 font-semibold">
+          <Link
+            to="/"
+            className="text-lg text-primary flex items-center justify-center gap-2 font-semibold"
+          >
             Request a demo{" "}
             <span>
               <svg

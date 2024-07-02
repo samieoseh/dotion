@@ -23,7 +23,9 @@ dotenv.config();
 const source = process.env.DATABASE_CONNECTION;
 
 
-const userRoutes = require('./routes/user');
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
+const pageRoutes = require("./routes/page");
 
 mongoose.connect(source, {
 });
@@ -35,7 +37,9 @@ connection.once("open", () => {
 
 const port = 8080;
 
-app.use('/auth', userRoutes);
+app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
+app.use("/page", pageRoutes);
 
 app.listen(port, () => {
   console.log(`Listening on port:  ${port}`);

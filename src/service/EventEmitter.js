@@ -1,6 +1,6 @@
 class EventEmitter {
   constructor() {
-    this.events = {}
+    this.events = {};
   }
 
   _getEventListByName(eventName) {
@@ -12,15 +12,22 @@ class EventEmitter {
   }
 
   on(eventName, fn) {
-    this._getEventListByName(eventName).add(fn)
+    this._getEventListByName(eventName).add(fn);
+  }
+
+  off(eventName) {
+    const eventList = this._getEventListByName(eventName);
+    if (eventList) {
+      this.events[eventName].clear();
+    }
   }
 
   emit(eventName, ...args) {
     this._getEventListByName(eventName).forEach(
       function (fn) {
-        fn.apply(this, args)
-      }.bind(this)
-    )
+        fn.apply(this, args);
+      }.bind(this),
+    );
   }
 }
 
