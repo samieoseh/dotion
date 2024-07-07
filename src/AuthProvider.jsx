@@ -9,6 +9,7 @@ const AuthContext = createContext();
 
 function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
+  const [waitAndCheck, setWaitAndCheck] = useState(true);
   const { toast } = useToast();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -51,13 +52,16 @@ function AuthProvider({ children }) {
   }, [dispatch]);
 
   function success(user, message) {
-    dispatch(setUser(user));
-    setIsAuthenticated(true);
     if (message) {
       toast({
         title: message,
       });
     }
+    Promise.all([dispatch(setUser(user))]).then(() => {
+      console.log("done");
+      setIsAuthenticated(true);
+      setWaitAndCheck(false);
+    });
   }
 
   function pass(message) {
@@ -65,7 +69,10 @@ function AuthProvider({ children }) {
       title: message,
     });
   }
-  return (
+
+  return waitAndCheck ? (
+    <p>Loading</p>
+  ) : (
     <AuthContext.Provider value={{ isAuthenticated }}>
       {children}
     </AuthContext.Provider>

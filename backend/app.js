@@ -1,12 +1,16 @@
 /* eslint-disable no-undef */
 const express = require('express')
 const cors = require('cors');
-const mongoose = require('mongoose')
-const dotenv = require('dotenv');
-const bodyParser = require('body-parser')
+
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
+const pageRoutes = require("./routes/page");
+
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
 
 const app = express();
-
 
 // To parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // To parse application/json
 app.use(bodyParser.json());
 
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 
 dotenv.config();
@@ -23,9 +27,6 @@ dotenv.config();
 const source = process.env.DATABASE_CONNECTION;
 
 
-const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/user");
-const pageRoutes = require("./routes/page");
 
 mongoose.connect(source, {
 });

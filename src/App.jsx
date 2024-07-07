@@ -7,8 +7,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Route, Routes } from "react-router-dom";
 import AuthPage from "./app/main/auth/AuthPage";
 import LandingPage from "./app/main/landing/LandingPage";
-import HomePage from "./app/main/home/HomePage";
 import { AuthProvider, useAuth } from "./AuthProvider";
+import SidePanel from "./components/home/side-panel";
+import DocumentPage from "./app/main/document/DocumentPage";
 
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 axios.defaults.headers.common["Content-Type"] =
@@ -33,18 +34,21 @@ export default function App() {
       >
         <BrowserRouter>
           <AuthProvider>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<AuthPage />} />
-              <Route
-                path="/:id"
-                element={
-                  <PrivateRoute>
-                    <HomePage />
-                  </PrivateRoute>
-                }
-              />
-            </Routes>
+            <div className="h-screen w-full flex bg-[#191919]">
+              <SidePanel />
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<AuthPage />} />
+                <Route
+                  path="/:id"
+                  element={
+                    <PrivateRoute>
+                      <DocumentPage />
+                    </PrivateRoute>
+                  }
+                />
+              </Routes>
+            </div>
           </AuthProvider>
         </BrowserRouter>
         <Toaster />

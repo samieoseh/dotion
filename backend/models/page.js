@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const pageSchema = mongoose.Schema({
-  title: { type: String },
+  title: { type: String, default: "" },
   icon: { type: String },
   comment: { type: String },
   background: { type: String },

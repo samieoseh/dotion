@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export default function LandingPage() {
+  const params = useParams();
+  console.log({ params });
   return (
     <div className="w-[95%] mx-auto ">
       {/* Header */}

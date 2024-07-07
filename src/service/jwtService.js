@@ -87,6 +87,7 @@ class JwtService extends EventEmitter {
   };
 
   logoutUser = () => {
+    console.log("logging out");
     this.setSession(null);
     this.emit("onLogout");
   };
@@ -104,7 +105,7 @@ class JwtService extends EventEmitter {
           this.emit("onLogin", response.data.user);
         })
         .catch((err) => {
-          reject(err.response.data);
+          reject(err.response);
         });
     });
   };
