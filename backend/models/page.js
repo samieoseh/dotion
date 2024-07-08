@@ -5,6 +5,7 @@ const pageSchema = mongoose.Schema({
   icon: { type: String },
   comment: { type: String },
   background: { type: String },
+  backgroundId: { type: String },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 

@@ -39,6 +39,7 @@ exports.addPage = async (req, res) => {
 
 
 exports.updatePage = async (req, res) => {
+  console.log(req.body);
   try {
     const updatedPage = await Page.findByIdAndUpdate(
       req.params.id,

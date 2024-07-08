@@ -185,7 +185,7 @@ export default function AuthPage() {
     );
   } else {
     return (
-      <>
+      <div className="mx-auto">
         <Button onClick={() => oAuthLogin()}>Continue with Google</Button>
         <Form
           className="space-y-8 mx-auto w-[60%] flex flex-col items-center"
@@ -218,7 +218,7 @@ export default function AuthPage() {
             </Button>
           </form>
         </Form>
-      </>
+      </div>
     );
   }
 }
