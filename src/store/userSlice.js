@@ -11,11 +11,8 @@ const userSlice = createSlice({
     setUser: (state, action) => {
       state.currentUser = action.payload;
     },
-
     logoutUser: (state, action) => {
-      state.currentUser = {
-        name: "John Doe",
-      };
+      state = undefined;
     },
   },
 });

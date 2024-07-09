@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useToast } from "./components/ui/use-toast";
 import jwtService from "./service/jwtService";
 import { logoutUser, setUser } from "./store/userSlice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -13,6 +13,8 @@ function AuthProvider({ children }) {
   const { toast } = useToast();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  console.log({ location });
 
   useEffect(() => {
     jwtService.on("onLogin", (user) => {
@@ -29,18 +31,25 @@ function AuthProvider({ children }) {
       setIsAuthenticated(false);
       dispatch(logoutUser());
       pass("Logged out successfully!");
-      navigate("/login");
+      if (!location.pathname === "/") {
+        navigate("/login");
+      }
     });
 
     jwtService.on("onAutoLogout", async () => {
       setIsAuthenticated(false);
-      dispatch(logoutUser);
+      dispatch(logoutUser());
       pass("Logged out successfully!");
-      navigate("/login");
+      if (!location.pathname === "/") {
+        navigate("/login");
+      }
     });
 
     jwtService.on("onNoAccessToken", () => {
-      navigate("/login");
+      if (!location.pathname === "/") {
+        navigate("/login");
+      }
+      setWaitAndCheck(false);
     });
 
     jwtService.init();
@@ -71,7 +80,7 @@ function AuthProvider({ children }) {
   }
 
   return waitAndCheck ? (
-    <p>Loading</p>
+    <p className="text-black">Loading...</p>
   ) : (
     <AuthContext.Provider value={{ isAuthenticated }}>
       {children}

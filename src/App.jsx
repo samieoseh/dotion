@@ -10,6 +10,8 @@ import LandingPage from "./app/main/landing/LandingPage";
 import { AuthProvider, useAuth } from "./AuthProvider";
 import SidePanel from "./components/home/side-panel";
 import DocumentPage from "./app/main/document/DocumentPage";
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/mantine/style.css";
 
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 axios.defaults.headers.common["Content-Type"] =
@@ -18,11 +20,7 @@ axios.defaults.baseURL = import.meta.env.VITE_REACT_APP_BASE_BACKEND;
 
 function PrivateRoute({ children }) {
   const { isAuthenticated } = useAuth();
-
-  if (isAuthenticated === undefined) {
-    return <div>Loading...</div>; // or a spinner component
-  }
-
+  console.log(isAuthenticated);
   return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
@@ -34,21 +32,21 @@ export default function App() {
       >
         <BrowserRouter>
           <AuthProvider>
-            <div className="h-screen w-full flex bg-[#191919]">
-              <SidePanel />
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<AuthPage />} />
-                <Route
-                  path="/:id"
-                  element={
-                    <PrivateRoute>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<AuthPage />} />
+              <Route
+                path="/:id"
+                element={
+                  <PrivateRoute>
+                    <div className="h-screen w-full flex bg-[#1f1f1f]">
+                      <SidePanel />
                       <DocumentPage />
-                    </PrivateRoute>
-                  }
-                />
-              </Routes>
-            </div>
+                    </div>
+                  </PrivateRoute>
+                }
+              />
+            </Routes>
           </AuthProvider>
         </BrowserRouter>
         <Toaster />

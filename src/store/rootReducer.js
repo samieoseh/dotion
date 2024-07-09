@@ -6,7 +6,7 @@ const createReducer = (asyncReducers) => (state, action) => {
     ...asyncReducers,
   });
 
-  if (action.type === "user/userLoggedOut") {
+  if (action.type === "user/logoutUser") {
     state = undefined;
   }
 
