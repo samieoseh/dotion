@@ -50,6 +50,7 @@ const Folder = ({
   );
   const [isHovered, setIsHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  console.log({ isOpen }, { document });
 
   return (
     <div>
@@ -65,97 +66,130 @@ const Folder = ({
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <Link
-                className="flex items-center gap-2 flex-1"
-                to={`/${document._id}`}
-              >
+              <div className="flex items-center gap-2 flex-1">
                 {document.icon ? (
-                  isHovered && childFolders.length > 0 ? (
-                    isOpen ? (
-                      <button
-                        className={`p-[4px] opacity-0 ${isHovered && "opacity-100"} rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150`}
-                        onClick={() => setIsOpen((prev) => !prev)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="#989994"
-                          className="size-5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                          />
-                        </svg>
-                      </button>
-                    ) : (
-                      <button
-                        className="p-[4px] rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150"
-                        onClick={() => setIsOpen((prev) => !prev)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="#989994"
-                          className="size-5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                          />
-                        </svg>
-                      </button>
-                    )
-                  ) : (
-                    <Emoji unified={document?.icon} size="25" />
-                  )
-                ) : isHovered && childFolders.length > 0 ? (
-                  <button className="p-[4px] rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="#989994"
-                      className="size-5"
+                  <div className="w-8 h-full">
+                    <button
+                      className={`p-[4px] absolute top-1  left-[${2 + indent * 4}px] opacity-0 ${isHovered && isOpen && childFolders.length > 0 && "opacity-100"} rounded-md bg-[#3d3d3d] transition-all ease-in-out duration-150 z-10`}
+                      onClick={() => setIsOpen((prev) => !prev)}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                      />
-                    </svg>
-                  </button>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="#989994"
+                        className="size-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      className={`p-[4px] opacity-0 absolute top-1 left-[${2 + indent * 4}px] ${isHovered && !isOpen && childFolders.length > 0 && "opacity-100"} rounded-md bg-[#3d3d3d] transition-all ease-in-out duration-150 z-10`}
+                      onClick={() => setIsOpen((prev) => !prev)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="#989994"
+                        className="size-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                        />
+                      </svg>
+                    </button>
+
+                    <div
+                      className={`absolute top-1 left-[${2 + indent * 4}px] block ${isHovered && childFolders.length > 0 && "hidden"}`}
+                    >
+                      <Emoji unified={document?.icon} size="25" />
+                    </div>
+                  </div>
                 ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="#989994"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                    />
-                  </svg>
+                  <div className="w-8 h-full">
+                    <button
+                      className={`p-[4px] absolute top-1 left-[${2 + indent * 4}px] opacity-0 ${isHovered && isOpen && childFolders.length > 0 && "opacity-100"} rounded-md bg-[#3d3d3d] transition-all ease-in-out duration-150 z-10`}
+                      onClick={() => setIsOpen((prev) => !prev)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="#989994"
+                        className="size-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      className={`p-[4px] opacity-0 absolute top-1 left-[${2 + indent * 4}px] ${isHovered && !isOpen && childFolders.length > 0 && "opacity-100"} rounded-md bg-[#3d3d3d] transition-all ease-in-out duration-150 z-10`}
+                      onClick={() => setIsOpen((prev) => !prev)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="#989994"
+                        className="size-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                        />
+                      </svg>
+                    </button>
+
+                    <div
+                      className={`absolute top-2 left-[${2 + indent * 4}px] block ${isHovered && childFolders.length > 0 && "hidden"}`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="#989994"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
                 )}
-                <p className="text-md text-[#989994]">
+                <p
+                  className="text-md text-[#989994]"
+                  // style={{
+                  //   marginLeft: `${indent}px`,
+                  // }}
+                >
                   {document.title === ""
                     ? "Untitled"
                     : document.title.length > 15
                       ? document.title.substring(0, 15) + "..."
                       : document.title}
                 </p>
-              </Link>
+              </div>
 
               {isHovered && (
                 <>
@@ -339,7 +373,12 @@ const Folder = ({
                   <button
                     className="mr-2 p-[1px] rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150 absolute z-10 top-2 right-0"
                     onClick={() =>
-                      dispatch(createSubDocument({ parentId: document._id }))
+                      dispatch(
+                        createSubDocument({ parentId: document._id }),
+                      ).then(() => {
+                        console.log("setting");
+                        setIsOpen(true);
+                      })
                     }
                   >
                     <svg
@@ -359,6 +398,10 @@ const Folder = ({
                   </button>
                 </>
               )}
+              <Link
+                to={`/${document._id}`}
+                className="top-0 left-0 right-0 bottom-0 absolute"
+              ></Link>
             </div>
           </div>
         )}
