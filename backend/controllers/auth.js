@@ -50,7 +50,9 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid token/token expired" });
     }
 
-    let user = await User.findOne({ email }).lean();
+    let user = await User.findOne({ email })
+      .lean()
+      .populate("recentlyVisited.pageId");
     if (!user) {
       console.log("creating");
       user = new User({
@@ -95,7 +97,9 @@ exports.loginUserWithGoogleToken = async (req, res) => {
       email_verified,
     } = response.data;
 
-    let user = await User.findOne({ email }).lean();
+    let user = await User.findOne({ email })
+      .lean()
+      .populate("recentlyVisited.pageId");
 
     if (!user) {
       user = new User({
@@ -122,7 +126,9 @@ exports.loginUserWithGoogleToken = async (req, res) => {
 
 exports.loginWithToken = async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.auth.userId });
+    const user = await User.findOne({ _id: req.auth.userId })
+      .lean()
+      .populate("recentlyVisited.pageId");
 
     if (user) {
       return res

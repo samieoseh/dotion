@@ -12,6 +12,8 @@ import SidePanel from "./components/home/side-panel";
 import DocumentPage from "./app/main/document/DocumentPage";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
+import "swiper/css";
+import "swiper/css/navigation";
 
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 axios.defaults.headers.common["Content-Type"] =
@@ -20,7 +22,6 @@ axios.defaults.baseURL = import.meta.env.VITE_REACT_APP_BASE_BACKEND;
 
 function PrivateRoute({ children }) {
   const { isAuthenticated } = useAuth();
-  console.log(isAuthenticated);
   return isAuthenticated ? children : <Navigate to="/login" />;
 }
 

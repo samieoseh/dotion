@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { selectUser } from "@/store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -12,20 +13,377 @@ import { Check } from "lucide-react";
 import jwtService from "../../service/jwtService";
 import {
   createDocument,
+  createSubDocument,
   deleteDocument,
   documentSelectors,
+  duplicateDocument,
   getDocuments,
+  selectFavoriteDocuments,
   selectLoadingFetch,
+  updateDocument,
 } from "@/app/main/document/store/documentSlice";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Emoji } from "emoji-picker-react";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useToast } from "../ui/use-toast";
 
 const truncateText = (text, maxLength) => {
   if (text.length <= maxLength) {
     return text;
   }
   return text.substring(0, maxLength) + "...";
+};
+const Folder = ({
+  indent = 0,
+  document,
+  documentId,
+  documents,
+  user,
+  handleDuplicate,
+  copyToClipboard,
+  openInNewTab,
+}) => {
+  const dispatch = useDispatch();
+  const childFolders = documents.filter(
+    (document) => document.parentId === documentId,
+  );
+  const [isHovered, setIsHovered] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <>
+        {!document.isFavorite && (
+          <div key={document._id}>
+            <div
+              className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex justify-between items-center relative"
+              to={`/${document._id}`}
+              style={{
+                paddingLeft: indent + 8,
+              }}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              <Link
+                className="flex items-center gap-2 flex-1"
+                to={`/${document._id}`}
+              >
+                {document.icon ? (
+                  isHovered && childFolders.length > 0 ? (
+                    isOpen ? (
+                      <button
+                        className={`p-[4px] opacity-0 ${isHovered && "opacity-100"} rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150`}
+                        onClick={() => setIsOpen((prev) => !prev)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="#989994"
+                          className="size-5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                          />
+                        </svg>
+                      </button>
+                    ) : (
+                      <button
+                        className="p-[4px] rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150"
+                        onClick={() => setIsOpen((prev) => !prev)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="#989994"
+                          className="size-5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                          />
+                        </svg>
+                      </button>
+                    )
+                  ) : (
+                    <Emoji unified={document?.icon} size="25" />
+                  )
+                ) : isHovered && childFolders.length > 0 ? (
+                  <button className="p-[4px] rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="#989994"
+                      className="size-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                      />
+                    </svg>
+                  </button>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="#989994"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                    />
+                  </svg>
+                )}
+                <p className="text-md text-[#989994]">
+                  {document.title === ""
+                    ? "Untitled"
+                    : document.title.length > 15
+                      ? document.title.substring(0, 15) + "..."
+                      : document.title}
+                </p>
+              </Link>
+
+              {isHovered && (
+                <>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="mr-10 p-[1px] rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150 absolute z-10 top-2 right-0">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="#989994"
+                          className="size-5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                          />
+                        </svg>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 ml-[14rem] p-0 bg-[#252525] border-none">
+                      <div className="space-y-1">
+                        <div className="pt-2 px-2">
+                          <button
+                            className="text-[#bfbfbf] text-left  w-full px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                            onClick={() =>
+                              dispatch(
+                                updateDocument({
+                                  _id: document._id,
+                                  data: { isFavorite: true },
+                                }),
+                              )
+                            }
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                              />
+                            </svg>
+                            Add to favorite
+                          </button>
+                        </div>
+                        <Separator className="bg-[#363636]" />
+                        <div className="flex flex-col space-y-1 pb-2 px-2">
+                          <button
+                            className="text-[#bfbfbf] text-left  px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                            onClick={() => copyToClipboard()}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                              />
+                            </svg>
+                            Copy Link
+                          </button>
+                          <button
+                            className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                            onClick={() => handleDuplicate(document)}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
+                              />
+                            </svg>
+                            Duplicate
+                          </button>
+                          <button className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                              />
+                            </svg>
+                            Rename
+                          </button>
+                          <button className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3"
+                              />
+                            </svg>
+                            Move to
+                          </button>
+                          <button
+                            className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                            onClick={() =>
+                              dispatch(deleteDocument(document._id))
+                            }
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                              />
+                            </svg>
+                            Delete
+                          </button>
+                          <button
+                            className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                            onClick={() => openInNewTab(location.pathname)}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"
+                              />
+                            </svg>
+                            Open in new tab
+                          </button>
+                        </div>
+                        <Separator className="my-4 bg-[#363636]" />
+                        <p>
+                          Last edited by <span>{user?.name || "User"}</span>
+                        </p>
+                        <p>{new Date().toString()}</p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <button
+                    className="mr-2 p-[1px] rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150 absolute z-10 top-2 right-0"
+                    onClick={() =>
+                      dispatch(createSubDocument({ parentId: document._id }))
+                    }
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="#989994"
+                      className="size-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 4.5v15m7.5-7.5h-15"
+                      />
+                    </svg>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </>
+      {childFolders.map((folder) => {
+        return (
+          <>
+            {isOpen && (
+              <Folder
+                key={folder._id}
+                indent={indent + 16}
+                document={folder}
+                documentId={folder._id}
+                documents={documents}
+                user={user}
+                handleDuplicate={handleDuplicate}
+                copyToClipboard={copyToClipboard}
+                openInNewTab={openInNewTab}
+              />
+            )}
+          </>
+        );
+      })}
+    </div>
+  );
 };
 
 export default function SidePanel() {
@@ -34,13 +392,35 @@ export default function SidePanel() {
   const navigate = useNavigate();
   const documents = useSelector(documentSelectors.selectAll);
   const documentLoadingFetch = useSelector(selectLoadingFetch);
+  const favoriteDocuments = useSelector(selectFavoriteDocuments);
+  const location = useLocation();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (documentLoadingFetch === undefined) {
-      console.log("Not Loaded");
       dispatch(getDocuments());
     }
   }, []);
+
+  const openInNewTab = (url) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href).then(
+      () => {
+        toast({ title: "Link copied to clipboard" });
+      },
+      (err) => {
+        console.error("Failed to copy: ", err);
+        toast({ title: "Failed to copy" });
+      },
+    );
+  };
+
+  const rootFolders = documents?.filter(
+    (document) => document.parentId === null,
+  );
 
   return (
     <div>
@@ -180,6 +560,8 @@ export default function SidePanel() {
               </button>
             </div>
           </div>
+
+          {/* main nav */}
           <div className="mx-2 my-2 flex flex-col">
             <button className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex gap-2 items-center">
               <svg
@@ -199,7 +581,10 @@ export default function SidePanel() {
 
               <p className="text-[#989994]">Search</p>
             </button>
-            <button className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex gap-2 items-center">
+            <Link
+              className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex gap-2 items-center"
+              to="/82cff8ee39dd442ea7540d6e73a4e7ad"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -216,7 +601,7 @@ export default function SidePanel() {
               </svg>
 
               <p className="text-[#989994]">Home</p>
-            </button>
+            </Link>
             <button className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex gap-2 items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -259,62 +644,259 @@ export default function SidePanel() {
               <p className="text-[#989994]">Settings</p>
             </button>
           </div>
+
+          {/* favorite nav */}
+          <>
+            {favoriteDocuments.length !== 0 && (
+              <div className="mx-2 space-y-2 py-4">
+                <button className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md">
+                  <p className="text-sm text-[#989994] ">Favorites</p>
+                </button>
+                <div className="space-y-2">
+                  {/* List of documents */}
+                  {favoriteDocuments.map((document) => (
+                    <>
+                      {document.isFavorite && (
+                        <div key={document._id}>
+                          <div
+                            className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex justify-between items-center relative"
+                            to={`/${document._id}`}
+                          >
+                            <Link
+                              className="flex items-center gap-2 flex-1"
+                              to={`/${document._id}`}
+                            >
+                              {document.icon ? (
+                                <Emoji unified={document?.icon} size="25" />
+                              ) : (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={1.5}
+                                  stroke="#989994"
+                                  className="w-5 h-5"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                                  />
+                                </svg>
+                              )}
+                              <p className="text-md text-[#989994]">
+                                {document.title === ""
+                                  ? "Untitled"
+                                  : document.title}
+                              </p>
+                            </Link>
+
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button className="mr-4 p-[1px] rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150 absolute z-10 top-1 right-0">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="#989994"
+                                    className="size-6"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                                    />
+                                  </svg>
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-80 ml-[14rem] p-0 bg-[#252525] border-none">
+                                <div className="space-y-1">
+                                  <div className="pt-2 px-2">
+                                    <button
+                                      className="text-[#bfbfbf] text-left  w-full px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                                      onClick={() =>
+                                        dispatch(
+                                          updateDocument({
+                                            _id: document._id,
+                                            data: { isFavorite: false },
+                                          }),
+                                        )
+                                      }
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                                        />
+                                      </svg>
+                                      Remove from favorite
+                                    </button>
+                                  </div>
+                                  <Separator className="bg-[#363636]" />
+                                  <div className="flex flex-col space-y-1 pb-2 px-2">
+                                    <button
+                                      className="text-[#bfbfbf] text-left  px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                                      onClick={() => copyToClipboard()}
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                                        />
+                                      </svg>
+                                      Copy Link
+                                    </button>
+                                    <button
+                                      className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                                      onClick={() => handleDuplicate(document)}
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
+                                        />
+                                      </svg>
+                                      Duplicate
+                                    </button>
+                                    <button className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                                        />
+                                      </svg>
+                                      Rename
+                                    </button>
+                                    <button className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3"
+                                        />
+                                      </svg>
+                                      Move to
+                                    </button>
+                                    <button
+                                      className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                                      onClick={() =>
+                                        dispatch(deleteDocument(document._id))
+                                      }
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                        />
+                                      </svg>
+                                      Delete
+                                    </button>
+                                    <button
+                                      className="text-[#bfbfbf] text-left px-4 py-1.5 rounded-md hover:bg-[#313131] flex items-center gap-2"
+                                      onClick={() =>
+                                        openInNewTab(location.pathname)
+                                      }
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"
+                                        />
+                                      </svg>
+                                      Open in new tab
+                                    </button>
+                                  </div>
+                                  <Separator className="my-4 bg-[#363636]" />
+                                  <p>
+                                    Last edited by{" "}
+                                    <span>{user?.name || "User"}</span>
+                                  </p>
+                                  <p>{new Date().toString()}</p>
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+          {/* documents nav */}
           <div className="mx-2 space-y-2 py-4">
             <button className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md">
               <p className="text-sm text-[#989994] ">Private</p>
             </button>
             <div className="space-y-2">
-              {/* List of documents */}
-              {documents.map((document) => (
-                <div key={document._id}>
-                  <Link
-                    className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex justify-between items-center "
-                    to={`/${document._id}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {document.icon ? (
-                        <Emoji unified={document?.icon} size="25" />
-                      ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="#989994"
-                          className="w-5 h-5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                          />
-                        </svg>
-                      )}
-                      <p className="text-md text-[#989994]">
-                        {document.title === "" ? "Untitled" : document.title}
-                      </p>
-                    </div>
-                    <button
-                      className="mr-4 p-1 rounded-md hover:bg-[#3d3d3d] transition-all ease-in-out duration-150"
-                      onClick={() => dispatch(deleteDocument(document._id))}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="#989994"
-                        className="w-5 h-5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                        />
-                      </svg>
-                    </button>
-                  </Link>
-                </div>
+              {rootFolders.map((folder) => (
+                <Folder
+                  key={folder._id}
+                  document={folder}
+                  documentId={folder._id}
+                  documents={documents}
+                  user={user}
+                  handleDuplicate={() => {}}
+                  copyToClipboard={copyToClipboard}
+                  openInNewTab={openInNewTab}
+                />
               ))}
             </div>
           </div>

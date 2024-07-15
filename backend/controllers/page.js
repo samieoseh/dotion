@@ -16,7 +16,7 @@ exports.addPage = async (req, res) => {
   try {
     const userId = req.auth.userId;
 
-    const { title, icon, comment, background } = req.body;
+    const { title, icon, comment, background, parentId } = req.body;
 
     const newPage = new Page({
       title,
@@ -24,6 +24,7 @@ exports.addPage = async (req, res) => {
       comment,
       background,
       userId,
+      parentId,
     });
 
     await newPage.save();
@@ -36,7 +37,6 @@ exports.addPage = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 exports.updatePage = async (req, res) => {
   console.log(req.body);
@@ -60,7 +60,6 @@ exports.deletePage = async (req, res) => {
     const deletedPage = await Page.findByIdAndDelete(req.params.id, {
       new: true,
     });
-    console.log({ deletedPage });
     return res
       .status(200)
       .json({ message: "Page deleted successfully", deletedPage });

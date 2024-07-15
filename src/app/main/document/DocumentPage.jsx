@@ -1,7 +1,11 @@
 import withReducer from "@/store/withReducer";
 import reducer from "./store";
 import { useParams } from "react-router-dom";
-import { selectDocumentById, updateDocument } from "./store/documentSlice";
+import {
+  selectDocumentById,
+  selectLoadingFetch,
+  updateDocument,
+} from "./store/documentSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { debounce } from "lodash";
@@ -13,18 +17,21 @@ import {
 import EmojiPicker, { Emoji } from "emoji-picker-react";
 import storage from "../../../service/appwriteService";
 import { ID } from "appwrite";
-import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BlockNoteEditor } from "@blocknote/core";
+import HomePage from "./HomePage";
+import { selectUser, updateUser } from "@/store/userSlice";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function DocumentPage() {
   const params = useParams();
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const document = useSelector((state) =>
     selectDocumentById(state, params?.id),
   );
+  const loadingFetch = useSelector(selectLoadingFetch);
 
   const [data, setData] = useState(null);
   const [selectedCover, setSelectedCover] = useState(null);
@@ -41,6 +48,27 @@ function DocumentPage() {
     setInitialContent(
       document?.blocks ? JSON.parse(document?.blocks) : undefined,
     );
+  }, [document]);
+
+  useEffect(() => {
+    if (document && user) {
+      const updatedVisited = user.recentlyVisited.filter(
+        (visitedPage) =>
+          visitedPage.pageId && visitedPage.pageId._id !== params.id,
+      );
+      console.log({ updatedVisited });
+      dispatch(
+        updateUser({
+          _id: user._id,
+          data: {
+            recentlyVisited: [
+              { visitedAt: new Date().getTime(), pageId: params.id },
+              ...updatedVisited,
+            ],
+          },
+        }),
+      );
+    }
   }, [document]);
 
   const editor = useMemo(() => {
@@ -126,15 +154,24 @@ function DocumentPage() {
         updateDocument({ _id: params.id, data: { blocks: stringifiedBlocks } }),
       );
     }, 1000),
-    [dispatch, params.id]
+    [dispatch, params.id],
   );
+
+  if (loadingFetch) {
+    return <p>Loading Pages....</p>;
+  }
+  if (!document) {
+    return <HomePage />;
+  }
+
+  // set recently visited
 
   return (
     <>
       {data && (
         <ScrollArea className="ml-[18rem] h-full w-full rounded-md ">
           <div className="w-[99.3%]">
-            <button className="m-4 hover:bg-[#ab5f5f] rounded-md p-1 flex items-center gap-2">
+            <button className="m-4 hover:bg-[#2c2c2c] rounded-md p-1 flex items-center gap-2">
               {document?.icon && <Emoji unified={document.icon} size="25" />}
               <p className="text-white">
                 {document.title === "" ? "Untitled" : document.title}
