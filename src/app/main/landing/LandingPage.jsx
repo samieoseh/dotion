@@ -29,7 +29,7 @@ export default function LandingPage() {
           className="rounded-md bg-black  text-white text-lg px-5 py-2 font-semibold"
           to="/login"
         >
-          Get Notion free
+          Get Jotion free
         </Link>
       </header>
 
@@ -55,7 +55,7 @@ export default function LandingPage() {
             className="rounded-md bg-primary  text-white text-lg px-5 py-2 font-semibold"
             to="/login"
           >
-            Get Notion free
+            Get Jotion free
           </Link>
           <Link
             to="/"
