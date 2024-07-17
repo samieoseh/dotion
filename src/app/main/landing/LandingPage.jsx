@@ -26,7 +26,7 @@ export default function LandingPage() {
           </svg>
         </Button>
         <Button className="hidden lg:block bg-black hover:bg-[#262626]">
-          Get Notion Free
+          Get Jotion Free
         </Button>
       </header>
 
