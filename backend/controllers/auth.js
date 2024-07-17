@@ -148,7 +148,7 @@ exports.sendToken = async (req, res) => {
   try {
     const { email } = req.body;
     const token = totp.generate(process.env.ACCESS_TOKEN_SECRET);
-    console.log("token sent: ", token);
+    // console.log("token sent: ", token);
 
     const options = {
       email,
