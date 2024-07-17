@@ -24,7 +24,7 @@ import HomePage from "./HomePage";
 import { selectUser, updateUser } from "@/store/userSlice";
 
 // eslint-disable-next-line react-refresh/only-export-components
-function DocumentPage() {
+function DocumentPage({ setShowNav }) {
   const params = useParams();
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
@@ -161,7 +161,7 @@ function DocumentPage() {
     return <p>Loading Pages....</p>;
   }
   if (!document) {
-    return <HomePage />;
+    return <HomePage setShowNav={setShowNav} />;
   }
 
   // set recently visited
@@ -169,20 +169,42 @@ function DocumentPage() {
   return (
     <>
       {data && (
-        <ScrollArea className="ml-[18rem] h-full w-full rounded-md ">
-          <div className="w-[99.3%]">
-            <button className="m-4 hover:bg-[#2c2c2c] rounded-md p-1 flex items-center gap-2">
-              {document?.icon && <Emoji unified={document.icon} size="25" />}
-              <p className="text-white">
-                {document.title === "" ? "Untitled" : document.title}
-              </p>
-            </button>
+        <ScrollArea className="mx-auto lg:ml-[18rem] h-full w-full rounded-md ">
+          <div className="document-body">
+            <div className="group flex items-center m-4 gap-2">
+              <button
+                className="p-[4px] lg:hidden rounded-md hover:bg-[#3d3d3d] hover:*:stroke-[#fff] group-hover:opacity-100 flex opacity-0 transition-all duration-300 ease-in-out items-center justify-center"
+                onClick={() => setShowNav((prev) => !prev)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="#757575"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"
+                  />
+                </svg>
+              </button>
+              <button className="hover:bg-[#2c2c2c] rounded-md p-1 flex items-center gap-2">
+                {document?.icon && <Emoji unified={document.icon} size="25" />}
+                <p className="text-white">
+                  {document.title === "" ? "Untitled" : document.title}
+                </p>
+              </button>
+            </div>
+
             {selectedCover && (
               <div className="w-full h-64 relative z-10">
                 <img
                   src={selectedCover}
                   alt={selectedCover}
-                  className="h-64 overflow-hidden w-full object-cover object-center"
+                  className="h-64 overflow-hidden  w-full object-cover object-center"
                 />
                 {document.background && (
                   <div className="absolute top-10 right-80">
@@ -217,7 +239,7 @@ function DocumentPage() {
               </div>
             )}
             <div
-              className={`w-full relative z-20 pl-64 pr-48 ${!selectedCover && "pt-48 "} ${selectedEmoji ? "-mt-12" : "mt-8"} group space-y-1`}
+              className={`w-full relative z-20 mx-auto pl-24  pr-12 lg:pl-64 lg:pr-48 ${!selectedCover && "pt-48 "} ${selectedEmoji ? "-mt-12" : "mt-8"} group space-y-1`}
             >
               {selectedEmoji && (
                 <Popover>
@@ -246,7 +268,7 @@ function DocumentPage() {
                   </PopoverContent>
                 </Popover>
               )}
-              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all ease-in-out duration-300">
+              <div className="flex  gap-2 opacity-0 group-hover:opacity-100 transition-all ease-in-out duration-300">
                 <div>
                   {!selectedEmoji && (
                     <Popover>
@@ -326,7 +348,7 @@ function DocumentPage() {
                 </div>
               </div>
               <input
-                className="text-[#e6e6e6] bg-transparent border-none outline-none text-5xl font-bold placeholder-[#373737]"
+                className="text-[#e6e6e6] lg:text-left bg-transparent border-none outline-none text-5xl font-bold placeholder-[#373737]"
                 placeholder={
                   document.title === "" ? "Untitled" : document.title
                 }

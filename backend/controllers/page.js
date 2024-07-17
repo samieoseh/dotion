@@ -91,7 +91,7 @@ exports.updatePage = async (req, res) => {
   try {
     const updatedPage = await Page.findByIdAndUpdate(
       req.params.id,
-      { ...req.body },
+      { ...req.body, updatedAt: new Date().getTime() },
       { new: true },
     );
     return res
