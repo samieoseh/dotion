@@ -113,7 +113,7 @@ export default function HomePage() {
   );
 
   return (
-    <div className="ml-[18rem] h-full w-full rounded-md">
+    <div className="ml-[18rem] h-full w-[85%] rounded-md">
       <div className="flex items-center justify-center py-20">
         <Popover>
           <p className="text-4xl font-bold">

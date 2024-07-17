@@ -56,7 +56,7 @@ function DocumentPage() {
         (visitedPage) =>
           visitedPage.pageId && visitedPage.pageId._id !== params.id,
       );
-      console.log({ updatedVisited });
+
       dispatch(
         updateUser({
           _id: user._id,
