@@ -14,6 +14,7 @@ const pageSchema = mongoose.Schema({
     ref: "Page",
     default: null,
   },
+  createdAt: { type: Number },
 });
 
 module.exports = mongoose.model("Page", pageSchema);

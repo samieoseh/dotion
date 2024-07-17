@@ -42,7 +42,7 @@ export const duplicateDocument = createAsyncThunk(
   "documentsPage/duplicateDocument",
   async (pageData, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/page", pageData);
+      const response = await axios.post("/page/duplicate", pageData);
       const data = await response.data;
       return data;
     } catch (error) {
@@ -108,9 +108,6 @@ const documentSlice = createSlice({
     builder.addCase(createSubDocument.fulfilled, (state, action) => {
       documentAdapter.addOne(state, action.payload.page);
     });
-    builder.addCase(duplicateDocument.fulfilled, (state, action) => {
-      documentAdapter.addOne(state, action.payload.page);
-    });
     builder.addCase(getDocuments.pending, (state) => {
       state.loadingFetch = true;
     });
@@ -139,9 +136,16 @@ const documentSlice = createSlice({
       action.payload.updatedPage.isFavorite &&
         state.favoriteDocuments.push(action.payload.updatedPage);
     });
+    builder.addCase(duplicateDocument.fulfilled, (state, action) => {
+      console.log(action.payload.duplicatedPages);
+      action.payload.duplicatedPages.forEach((page) => {
+        documentAdapter.addOne(state, page);
+      });
+    });
     builder.addCase(deleteDocument.fulfilled, (state, action) => {
-      console.log(action.payload);
-      documentAdapter.removeOne(state, action.payload.deletedPage._id);
+      for (const _id of action.payload.deletedIds) {
+        documentAdapter.removeOne(state, _id);
+      }
     });
   },
 });
