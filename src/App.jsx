@@ -14,6 +14,7 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import "swiper/css";
 import "swiper/css/navigation";
+import { useState } from "react";
 
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 axios.defaults.headers.common["Content-Type"] =
@@ -26,6 +27,7 @@ function PrivateRoute({ children }) {
 }
 
 export default function App() {
+  const [showNav, setShowNav] = useState(false);
   return (
     <Provider store={store}>
       <GoogleOAuthProvider
@@ -41,8 +43,8 @@ export default function App() {
                 element={
                   <PrivateRoute>
                     <div className="h-screen w-full flex bg-[#1f1f1f]">
-                      <SidePanel />
-                      <DocumentPage />
+                      <SidePanel showNav={showNav} setShowNav={setShowNav} />
+                      <DocumentPage setShowNav={setShowNav} />
                     </div>
                   </PrivateRoute>
                 }

@@ -1,15 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Lottie from "lottie-react";
+import animationData from "../../../../public/animationData.json";
 
 export default function LandingPage() {
-  const params = useParams();
-  console.log({ params });
   return (
     <div className="w-[95%] mx-auto ">
       {/* Header */}
       <header className="py-2 flex items-center justify-between">
-        <Link className="text-2xl font-bold">Jotion</Link>
-        <Button className="p-0 h-auto bg-transparent hover:bg-transparent focus:bg-transparent">
+        <Link className="text-2xl font-bold text-black">Jotion</Link>
+        <Button className="lg:hidden p-0 h-auto bg-transparent hover:bg-transparent focus:bg-transparent">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -25,18 +25,21 @@ export default function LandingPage() {
             />
           </svg>
         </Button>
+        <Button className="hidden lg:block bg-black hover:bg-[#262626]">
+          Get Notion Free
+        </Button>
       </header>
 
       <section className="py-8 w-[90%] mx-auto">
         <div className="mx-auto flex items-center justify-center">
-          <h1 className="font-bold  break-words text-center text-[44px] leading-[54px]">
+          <h1 className="font-bold  break-words text-center text-[44px] leading-[54px] text-black">
             <span>Write, </span>
             <span>plan, </span>
             <br />
             <span>organize, </span> <span>play</span>
           </h1>
         </div>
-        <div className="pt-4">
+        <div className="pt-4 text-black">
           <p className="text-center text-2xl font-semibold">
             Turn ideas into action
           </p>
@@ -74,6 +77,14 @@ export default function LandingPage() {
             </span>
           </Link>
         </div>
+      </section>
+      <section className="flex mx-auto -mt-32 flex-row justify-center items-center relative h-96 w-96 ">
+        <Lottie
+          animationData={animationData}
+          height={2}
+          width={2}
+          className="absolute top-auto left-auto right-auto bottom-auto"
+        />
       </section>
     </div>
   );

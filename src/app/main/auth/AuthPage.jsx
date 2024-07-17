@@ -103,7 +103,7 @@ export default function AuthPage() {
   if (tokenSent) {
     return (
       <div className="mx-auto w-[98%] p-2 flex h-screen ">
-        <div className="w-[50%] h-full bg-primary flex items-center justify-center rounded-lg">
+        <div className="w-[50%] h-full bg-primary lg:flex items-center hidden justify-center rounded-lg">
           <img
             src="./login-illustration.svg"
             alt="login illustration"
@@ -200,7 +200,7 @@ export default function AuthPage() {
   } else {
     return (
       <div className="mx-auto w-[98%] p-2 flex h-screen ">
-        <div className="w-[50%] h-full bg-primary flex items-center justify-center rounded-lg">
+        <div className="w-[50%] h-full bg-primary hidden lg:flex items-center justify-center rounded-lg">
           <img
             src="./login-illustration.svg"
             alt="login illustration"
@@ -208,7 +208,7 @@ export default function AuthPage() {
             width={450}
           />
         </div>
-        <div className="w-[50%]">
+        <div className="w-[100%] lg:w-[50%]">
           <header className="p-4 flex items-center justify-between">
             <Link className="text-2xl font-bold text-gray-800" to="/">
               Jotion

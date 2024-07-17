@@ -71,3 +71,18 @@
   color: #fff;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
+.document-body {
+  width: calc(100vw - 18.5rem);
+}
+
+@media (max-width: 799px) {
+  .document-body {
+    width: calc(100vw - 0.4rem)
+  }
+}
+
+@media (max-width: 1200px) {
+  .document-body {
+    width: calc(100vw - 0.5rem)
+  }
+}

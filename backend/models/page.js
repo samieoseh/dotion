@@ -15,6 +15,7 @@ const pageSchema = mongoose.Schema({
     default: null,
   },
   createdAt: { type: Number },
+  updatedAt: { type: Number },
 });
 
 module.exports = mongoose.model("Page", pageSchema);

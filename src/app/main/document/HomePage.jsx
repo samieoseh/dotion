@@ -13,6 +13,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Emoji } from "emoji-picker-react";
 import TimeAgo from "@/components/TimeAgo";
+import { useMediaQuery } from "react-responsive";
 
 function getTimeOfDay(timestamp) {
   const date = new Date(timestamp);
@@ -89,13 +90,16 @@ const Card = ({ user, page }) => {
     </>
   );
 };
-export default function HomePage() {
+export default function HomePage({ setShowNav }) {
   const user = useSelector(selectUser);
   const timestamp = new Date().getTime();
   const timeOfDay = getTimeOfDay(timestamp);
   const [nickname, setNickname] = useState("User");
   const [recentlyVisited, setRecentlyVisited] = useState([]);
   const dispatch = useDispatch();
+  const isVeryLargeScreen = useMediaQuery({ query: "(min-width: 1800)" });
+  const isBigScreen = useMediaQuery({ query: "(min-width: 1200px)" });
+  const isLaptopScreen = useMediaQuery({ query: "(min-width: 800px)" });
 
   useEffect(() => {
     console.log("running useEffect");
@@ -113,60 +117,85 @@ export default function HomePage() {
   );
 
   return (
-    <div className="ml-[18rem] h-full w-[85%] rounded-md">
-      <div className="flex items-center justify-center py-20">
-        <Popover>
-          <p className="text-4xl font-bold">
-            Good {timeOfDay},{" "}
-            <PopoverTrigger asChild>
-              <button className="hover: hover:bg-[#2c2c2c] px-2 py-1.5 rounded-md">
-                {nickname}
-              </button>
-            </PopoverTrigger>
-          </p>
-          <PopoverContent className="w-[24rem] bg-[#252525] border-none mr-[24rem]">
-            <div className="grid gap-4">
-              <div className="space-y-4">
-                <h4 className="font-medium leading-none text-[#a1a1a1]">
-                  Edit Nickname
-                </h4>
-                <Input
-                  placeholder="Enter your nickname"
-                  className="h-8 w-full bg-[#323232] border border-[#454545] outline-none text-[#acacac] text-md focus-visible:ring-0 ring-offset-[#305a86]"
-                  value={nickname}
-                  onChange={(e) => {
-                    setNickname(e.target.value);
-                    handleNicknameChange(e.target.value);
-                  }}
-                />
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-      <div className="w-[70%] mx-auto">
-        {recentlyVisited.length > 0 && (
-          <p className="text-[#a1a1a1]">Recently Visited</p>
-        )}
-        <div className="mt-8">
-          <Swiper
-            modules={[Navigation]}
-            loop={false}
-            spaceBetween={20}
-            autoplay={false}
-            navigation
-            slidesPerView={5}
-            onSlideChange={() => console.log("slide change")}
-            onSwiper={(swiper) => console.log(swiper)}
+    <div className="w-full">
+      <div className="group flex items-center m-4 gap-2">
+        <button
+          className="p-[4px] lg:hidden rounded-md hover:bg-[#3d3d3d] hover:*:stroke-[#fff] group-hover:opacity-100 flex opacity-0 transition-all duration-300 ease-in-out items-center justify-center"
+          onClick={() => setShowNav((prev) => !prev)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="#757575"
+            className="w-6 h-6"
           >
-            {recentlyVisited.map((page) => (
-              <SwiperSlide key={page.pageId?._id}>
-                <Link to={`/${page.pageId?._id}`}>
-                  <Card page={page} user={user} />
-                </Link>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"
+            />
+          </svg>
+        </button>
+      </div>
+      <div className="lg:ml-[18rem] mx-auto h-full w-[85%] rounded-md">
+        <div className="flex items-center justify-center py-20">
+          <Popover>
+            <p className="text-4xl font-bold text-center">
+              Good {timeOfDay},{" "}
+              <PopoverTrigger asChild>
+                <button className="hover: hover:bg-[#2c2c2c] px-2 py-1.5 rounded-md">
+                  {nickname}
+                </button>
+              </PopoverTrigger>
+            </p>
+            <PopoverContent className="w-[24rem] bg-[#252525] border-none mr-[8rem] lg:mr-[24rem]">
+              <div className="grid gap-4">
+                <div className="space-y-4">
+                  <h4 className="font-medium leading-none text-[#a1a1a1]">
+                    Edit Nickname
+                  </h4>
+                  <Input
+                    placeholder="Enter your nickname"
+                    className="h-8 w-full bg-[#323232] border border-[#454545] outline-none text-[#acacac] text-md focus-visible:ring-0 ring-offset-[#305a86]"
+                    value={nickname}
+                    onChange={(e) => {
+                      setNickname(e.target.value);
+                      handleNicknameChange(e.target.value);
+                    }}
+                  />
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div className="w-[70%] mx-auto">
+          {recentlyVisited.length > 0 && (
+            <p className="text-[#a1a1a1]">Recently Visited</p>
+          )}
+          <div className="mt-8">
+            <Swiper
+              modules={[Navigation]}
+              loop={false}
+              spaceBetween={20}
+              autoplay={false}
+              navigation
+              slidesPerView={
+                isVeryLargeScreen ? 5 : isBigScreen ? 4 : isLaptopScreen ? 3 : 2
+              }
+              onSlideChange={() => console.log("slide change")}
+              onSwiper={(swiper) => console.log(swiper)}
+            >
+              {recentlyVisited.map((page) => (
+                <SwiperSlide key={page.pageId?._id}>
+                  <Link to={`/${page.pageId?._id}`}>
+                    <Card page={page} user={user} />
+                  </Link>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
         </div>
       </div>
     </div>

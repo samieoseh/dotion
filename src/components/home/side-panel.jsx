@@ -40,7 +40,11 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "../ui/scroll-area";
@@ -59,6 +63,7 @@ const Folder = ({
   user,
   handleDuplicate,
   copyToClipboard,
+  handleDocumentRename,
   openInNewTab,
 }) => {
   const dispatch = useDispatch();
@@ -67,6 +72,7 @@ const Folder = ({
   );
   const [isHovered, setIsHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [documentTitle, setDocumentTitle] = useState(document?.title);
 
   return (
     <div>
@@ -304,25 +310,47 @@ const Folder = ({
                           Duplicate
                         </button>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="m-1.5 py-1.5 focus:bg-[#313131]">
-                        <button className="text-[#bfbfbf] text-left  w-full rounded-md hover:bg-[#313131] flex items-center gap-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="size-6"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                            />
-                          </svg>
-                          Rename
-                        </button>
-                      </DropdownMenuItem>
+                      {/* Todo: */}
+
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="m-1.5 py-1.5 focus:bg-[#313131]">
+                          <button className="text-[#bfbfbf] text-left  w-full rounded-md hover:bg-[#313131] flex items-center gap-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                              />
+                            </svg>
+                            Rename
+                          </button>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent className="mx-4 bg-[#252525] border-none p-4">
+                            <div>
+                              <Input
+                                placeholder="Rename the document"
+                                className="h-8 w-full bg-[#323232] border border-[#454545] outline-none text-[#acacac] text-md focus-visible:ring-0 ring-offset-[#305a86]"
+                                value={documentTitle}
+                                onChange={(e) => {
+                                  setDocumentTitle(e.target.value);
+                                  handleDocumentRename(
+                                    document._id,
+                                    e.target.value,
+                                  );
+                                }}
+                              />
+                            </div>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
 
                       <DropdownMenuItem className="m-1.5 py-1.5 focus:bg-[#313131]">
                         <button
@@ -369,11 +397,19 @@ const Folder = ({
                         </button>
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
-                    <DropdownMenuSeparator className="my-4 bg-[#363636]" />
-                    <p>
-                      Last edited by <span>{user?.name || "User"}</span>
-                    </p>
-                    <p>{new Date().toString()}</p>
+                    {document.updatedAt && (
+                      <>
+                        <DropdownMenuSeparator className="my-4 bg-[#363636]" />
+                        <div className="px-4 py-1.5 mx-auto text-xs space-y-1.5">
+                          <p className="text-[#989994]">
+                            Last edited by <span>{user?.name || "User"}</span>
+                          </p>
+                          <p className="text-[#989994]">
+                            {new Date(document.updatedAt).toString()}
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -435,7 +471,7 @@ const Folder = ({
   );
 };
 
-export default function SidePanel() {
+export default function SidePanel({ showNav, setShowNav }) {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -494,12 +530,21 @@ export default function SidePanel() {
     dispatch(duplicateDocument(document));
   };
 
+  const handleDocumentRename = (documentId, documentTitle) => {
+    dispatch(
+      updateDocument({ _id: documentId, data: { title: documentTitle } }),
+    );
+  };
+  console.log({ showNav });
+
   return (
-    <div>
+    <div
+      className={`absolute z-30 lg:block lg:translate-x-0 transition-all duration-300 ease-out ${showNav ? "translate-x-0" : "-translate-x-80 "}`}
+    >
       {user && (
         <div className="w-[18rem] h-screen border-r border-[#4a4a4a] py-2 group bg-[#202020] fixed top-0 left-0 bottom-0">
           {/* top */}
-          <div className="h-[2.5rem] mx-2 hover:bg-[#2c2c2c] rounded-md flex items-center">
+          <div className="h-[2.5rem] mx-2 hover:bg-[#2c2c2c] rounded-md flex items-center lg:justify-between">
             <Select>
               <SelectTrigger className="w-[180px]">
                 <div className="py-2 flex items-center gap-3">
@@ -584,7 +629,10 @@ export default function SidePanel() {
               </SelectContent>
             </Select>
             <div className="flex gap-4">
-              <button className="p-[4px] rounded-md hover:bg-[#3d3d3d] hover:*:stroke-[#fff] group-hover:opacity-100 flex opacity-0 transition-all duration-300 ease-in-out items-center justify-center">
+              <button
+                className="p-[4px] lg:hidden rounded-md hover:bg-[#3d3d3d] hover:*:stroke-[#fff] group-hover:opacity-100 flex opacity-0 transition-all duration-300 ease-in-out items-center justify-center"
+                onClick={() => setShowNav((prev) => !prev)}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -614,6 +662,7 @@ export default function SidePanel() {
                     navigate(`/${action.payload.page._id}`);
                   });
                 }}
+                className="lg:pr-4"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -637,7 +686,10 @@ export default function SidePanel() {
           <div className="mx-2 my-2 flex flex-col">
             <Dialog>
               <DialogTrigger>
-                <button className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex gap-2 items-center">
+                <button
+                  className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex gap-2 items-center"
+                  onClick={() => setShowNav((prev) => !prev)}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -656,7 +708,7 @@ export default function SidePanel() {
                   <p className="text-[#989994]">Search</p>
                 </button>
               </DialogTrigger>
-              <DialogContent className="bg-[#252525] min-w-[52rem] border-none">
+              <DialogContent className="bg-[#252525] lg:min-w-[52rem] border-none">
                 <DialogHeader>
                   <div className="relative">
                     <Input
@@ -733,6 +785,7 @@ export default function SidePanel() {
             <Link
               className="hover:bg-[#2c2c2c] w-full text-left py-1.5 pl-3 rounded-md flex gap-2 items-center"
               to="/82cff8ee39dd442ea7540d6e73a4e7ad"
+              onClick={() => setShowNav((prev) => !prev)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -772,6 +825,7 @@ export default function SidePanel() {
                           handleDuplicate={handleDuplicate}
                           copyToClipboard={copyToClipboard}
                           openInNewTab={openInNewTab}
+                          handleDocumentRename={handleDocumentRename}
                         />
                       ))}
                     </div>
@@ -799,6 +853,7 @@ export default function SidePanel() {
                       handleDuplicate={handleDuplicate}
                       copyToClipboard={copyToClipboard}
                       openInNewTab={openInNewTab}
+                      handleDocumentRename={handleDocumentRename}
                     />
                   ))}
                 </div>
