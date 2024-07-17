@@ -39,7 +39,8 @@ const OTPFormSchema = z.object({
 
 export default function AuthPage() {
   const { toast } = useToast();
-  const [tokenSent, setTokenSent] = useState(false);
+  const [tokenSent, setTokenSent] = useState(true);
+
   const [email, setEmail] = useState("");
 
   const signupForm = useForm({
@@ -103,7 +104,7 @@ export default function AuthPage() {
   if (tokenSent) {
     return (
       <div className="mx-auto w-[98%] p-2 flex h-screen ">
-        <div className="w-[50%] h-full bg-primary lg:flex items-center hidden justify-center rounded-lg">
+        <div className="w-[50%] h-full bg-primary hidden lg:flex items-center justify-center rounded-lg">
           <img
             src="./login-illustration.svg"
             alt="login illustration"
@@ -111,7 +112,7 @@ export default function AuthPage() {
             width={450}
           />
         </div>
-        <div className="w-[50%]">
+        <div className="w-[100%] lg:w-[50%]">
           <header className="p-4 flex items-center justify-between">
             <Link className="text-2xl font-bold text-gray-800" to="/">
               Jotion
@@ -215,7 +216,7 @@ export default function AuthPage() {
             </Link>
           </header>
           <div className="flex items-center justify-center w-full pt-[25%]">
-            <div className="space-y-4 w-[60%]">
+            <div className="space-y-4 w-[80%] lg:w-[60%]">
               <Button
                 onClick={() => oAuthLogin()}
                 className="bg-transparent border text-gray-700 w-full hover:bg-transparent gap-2"
