@@ -24,6 +24,10 @@ function AuthProvider({ children }) {
     jwtService.on("onAutoLogin", async () => {
       const { user } = await jwtService.loginWithToken();
       success(user, "Logged in with JWT");
+      // force user to home page
+      if (location.pathname === "/") {
+        navigate("/home");
+      }
     });
 
     jwtService.on("onLogout", async () => {
