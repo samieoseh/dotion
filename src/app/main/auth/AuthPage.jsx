@@ -39,7 +39,7 @@ const OTPFormSchema = z.object({
 
 export default function AuthPage() {
   const { toast } = useToast();
-  const [tokenSent, setTokenSent] = useState(true);
+  const [tokenSent, setTokenSent] = useState(false);
 
   const [email, setEmail] = useState("");
 
