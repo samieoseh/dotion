@@ -25,9 +25,12 @@ export default function LandingPage() {
             />
           </svg>
         </Button>
-        <Button className="hidden lg:block bg-black hover:bg-[#262626]">
-          Get Jotion Free
-        </Button>
+        <Link
+          className="rounded-md bg-black  text-white text-lg px-5 py-2 font-semibold"
+          to="/login"
+        >
+          Get Notion free
+        </Link>
       </header>
 
       <section className="py-8 w-[90%] mx-auto">

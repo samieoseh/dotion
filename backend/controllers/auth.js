@@ -155,7 +155,7 @@ exports.sendToken = async (req, res) => {
       subject: "Your OTP Code",
       message: `Dear user,\n\nYour One-Time Password (OTP) is ${token}. Please use this code to complete your verification process. \n\nThank you,\nDotion`,
     };
-    // await sendMail(options);
+    await sendMail(options);
     return res
       .status(200)
       .json({ message: `An OTP token has been sent to ${email}` });
