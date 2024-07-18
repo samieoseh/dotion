@@ -26,7 +26,7 @@ export default function LandingPage() {
           </svg>
         </Button>
         <Link
-          className="rounded-md bg-black  text-white text-lg px-5 py-2 font-semibold"
+          className="hidden lg:block rounded-md bg-black  text-white text-lg px-5 py-2 font-semibold"
           to="/login"
         >
           Get Jotion free

@@ -173,7 +173,7 @@ function DocumentPage({ setShowNav }) {
           <div className="document-body">
             <div className="group flex items-center m-4 gap-2">
               <button
-                className="p-[4px] lg:hidden rounded-md hover:bg-[#3d3d3d] hover:*:stroke-[#fff] group-hover:opacity-100 flex opacity-0 transition-all duration-300 ease-in-out items-center justify-center"
+                className="p-[4px] lg:hidden rounded-md  flex opacity-100 transition-all duration-300 ease-in-out items-center justify-center"
                 onClick={() => setShowNav((prev) => !prev)}
               >
                 <svg
@@ -207,10 +207,10 @@ function DocumentPage({ setShowNav }) {
                   className="h-64 overflow-hidden  w-full object-cover object-center"
                 />
                 {document.background && (
-                  <div className="absolute top-10 right-80">
+                  <div className="absolute top-5 right-20 lg:top-10 lg:right-80">
                     <button
                       onClick={() => changeFileInputRef.current.click()}
-                      className="text-[13px] bg-[#252525] py-1 px-1.5 text-[#989898] border-r border-[#3b3b3b] hover:bg-[#3b3b3b] transition-all ease-in-out duration-200"
+                      className="text-xs lg:text-[13px] bg-[#252525] py-1 px-1.5 text-[#989898] border-r border-[#3b3b3b] hover:bg-[#3b3b3b] transition-all ease-in-out duration-200"
                       style={{
                         borderTopLeftRadius: "5px",
                         borderBottomLeftRadius: "5px",
@@ -225,7 +225,7 @@ function DocumentPage({ setShowNav }) {
                       <p>Change cover</p>
                     </button>
                     <button
-                      className="text-[13px]  bg-[#252525] py-1 px-1.5 text-[#989898] hover:bg-[#3b3b3b] transition-all ease-in-out duration-200"
+                      className="text-xs lg:text-[13px]  bg-[#252525] py-1 px-1.5 text-[#989898] hover:bg-[#3b3b3b] transition-all ease-in-out duration-200"
                       style={{
                         borderTopRightRadius: "5px",
                         borderBottomRightRadius: "5px",
@@ -289,7 +289,9 @@ function DocumentPage({ setShowNav }) {
                             />
                           </svg>
 
-                          <p className="text-[#5f5f5f]">Add Icon</p>
+                          <p className="text-[#5f5f5f] text-xs lg:text-sm">
+                            Add Icon
+                          </p>
                         </button>
                       </PopoverTrigger>
                       <PopoverContent className="bg-transparent border-none">
@@ -340,7 +342,10 @@ function DocumentPage({ setShowNav }) {
                         />
                       </svg>
 
-                      <p className="text-[#5f5f5f]" onClick={handleFileUpload}>
+                      <p
+                        className="text-[#5f5f5f] text-xs lg:text-sm"
+                        onClick={handleFileUpload}
+                      >
                         Add Cover
                       </p>
                     </button>
@@ -348,7 +353,7 @@ function DocumentPage({ setShowNav }) {
                 </div>
               </div>
               <input
-                className="text-[#e6e6e6] lg:text-left bg-transparent border-none outline-none text-5xl font-bold placeholder-[#373737]"
+                className="text-[#e6e6e6] lg:text-left bg-transparent border-none outline-none text-3xl lg:text-5xl font-bold placeholder-[#373737]"
                 placeholder={
                   document.title === "" ? "Untitled" : document.title
                 }
