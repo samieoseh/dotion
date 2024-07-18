@@ -630,7 +630,7 @@ export default function SidePanel({ showNav, setShowNav }) {
             </Select>
             <div className="flex gap-4">
               <button
-                className="p-[4px] lg:hidden rounded-md hover:bg-[#3d3d3d] hover:*:stroke-[#fff] group-hover:opacity-100 flex opacity-0 transition-all duration-300 ease-in-out items-center justify-center"
+                className="p-[4px] lg:hidden rounded-md  flex opacity-100 transition-all duration-300 ease-in-out items-center justify-center"
                 onClick={() => setShowNav((prev) => !prev)}
               >
                 <svg

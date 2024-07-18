@@ -100,6 +100,7 @@ export default function HomePage({ setShowNav }) {
   const isVeryLargeScreen = useMediaQuery({ query: "(min-width: 1800)" });
   const isBigScreen = useMediaQuery({ query: "(min-width: 1200px)" });
   const isLaptopScreen = useMediaQuery({ query: "(min-width: 800px)" });
+  const isMobileScreen = useMediaQuery({ query: "(min-width: 500px)" });
 
   useEffect(() => {
     console.log("running useEffect");
@@ -140,7 +141,7 @@ export default function HomePage({ setShowNav }) {
         </button>
       </div>
       <div className="lg:ml-[18rem] mx-auto h-full w-[85%] rounded-md">
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-10 lg:py-20">
           <Popover>
             <p className="text-4xl font-bold text-center">
               Good {timeOfDay},{" "}
@@ -182,7 +183,15 @@ export default function HomePage({ setShowNav }) {
               autoplay={false}
               navigation
               slidesPerView={
-                isVeryLargeScreen ? 5 : isBigScreen ? 4 : isLaptopScreen ? 3 : 2
+                isVeryLargeScreen
+                  ? 5
+                  : isBigScreen
+                    ? 4
+                    : isLaptopScreen
+                      ? 3
+                      : isMobileScreen
+                        ? 2
+                        : 1
               }
               onSlideChange={() => console.log("slide change")}
               onSwiper={(swiper) => console.log(swiper)}
